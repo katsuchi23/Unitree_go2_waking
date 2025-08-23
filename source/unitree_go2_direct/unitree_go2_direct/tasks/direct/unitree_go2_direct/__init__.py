@@ -13,11 +13,21 @@ from . import agents
 
 
 gym.register(
-    id="Template-Unitree-Go2-Direct-Direct-v0",
+    id="Template-Unitree-Go2-Rough-Direct-v0",
     entry_point=f"{__name__}.unitree_go2_direct_env:UnitreeGo2DirectEnv",
     disable_env_checker=True,
     kwargs={
-        "env_cfg_entry_point": f"{__name__}.unitree_go2_direct_env_cfg:UnitreeGo2DirectEnvCfg",
+        "env_cfg_entry_point": f"{__name__}.unitree_go2_direct_env_cfg:UnitreeGo2RoughEnvCfg",
+        "skrl_cfg_entry_point": f"{agents.__name__}:skrl_ppo_cfg.yaml",
+    },
+)
+
+gym.register(
+    id="Template-Unitree-Go2-Flat-Direct-v0",
+    entry_point=f"{__name__}.unitree_go2_direct_env:UnitreeGo2DirectEnv",
+    disable_env_checker=True,
+    kwargs={
+        "env_cfg_entry_point": f"{__name__}.unitree_go2_direct_env_cfg:UnitreeGo2FlatEnvCfg",
         "skrl_cfg_entry_point": f"{agents.__name__}:skrl_ppo_cfg.yaml",
     },
 )
