@@ -32,11 +32,23 @@ class EventCfg:
         mode="startup",
         params={
             "asset_cfg": SceneEntityCfg("robot", body_names=".*"),
-            "static_friction_range": (0.8, 0.8),
-            "dynamic_friction_range": (0.6, 0.6),
-            "restitution_range": (0.0, 0.0),
-            "num_buckets": 64,
+            "static_friction_range": (0.7, 1.3),
+            "dynamic_friction_range": (1.0, 1.0),
+            "restitution_range": (1.0, 1.0),
+            "num_buckets": 256,
         },
+    )
+
+    robot_joint_stiffness_and_damping = EventTerm(
+      func=mdp.randomize_actuator_gains,
+      mode="reset",
+      params={
+          "asset_cfg": SceneEntityCfg("robot", joint_names=".*"),
+          "stiffness_distribution_params": (0.75, 1.5),
+          "damping_distribution_params": (0.3, 3.0),
+          "operation": "scale",
+          "distribution": "log_uniform",
+      },
     )
 
     add_base_mass = EventTerm(
@@ -99,9 +111,9 @@ class UnitreeGo2FlatEnvCfg(DirectRLEnvCfg):
     )
 
     # reward scales
-    lin_vel_reward_scale = 3.0
+    lin_vel_reward_scale = 4.0
     yaw_rate_reward_scale = 3.0
-    z_vel_reward_scale = -4.0
+    z_vel_reward_scale = -2.0
     ang_vel_reward_scale = -0.1
     joint_torque_reward_scale = -2.5e-5
     joint_accel_reward_scale = -2.5e-7

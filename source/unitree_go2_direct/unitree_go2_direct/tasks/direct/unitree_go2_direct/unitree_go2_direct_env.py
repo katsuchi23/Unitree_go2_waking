@@ -75,7 +75,7 @@ class UnitreeGo2DirectEnv(DirectRLEnv):
 
     def _pre_physics_step(self, actions: torch.Tensor):
         self._actions = actions.clone()
-        self._processed_actions = self.cfg.action_scale * self._actions + self._robot.data.default_joint_pos + torch.rand_like(self._actions) * 0.1
+        self._processed_actions = self.cfg.action_scale * self._actions + self._robot.data.default_joint_pos
 
     def _apply_action(self):
         self._robot.set_joint_position_target(self._processed_actions)
@@ -91,12 +91,12 @@ class UnitreeGo2DirectEnv(DirectRLEnv):
             [
                 tensor
                 for tensor in (
-                    self._robot.data.root_lin_vel_b,
-                    self._robot.data.root_ang_vel_b,
-                    self._robot.data.projected_gravity_b,
+                    self._robot.data.root_lin_vel_b + torch.randn_like(self._robot.data.root_lin_vel_b) * 0.01,
+                    self._robot.data.root_ang_vel_b + torch.randn_like(self._robot.data.root_ang_vel_b) * 0.01,
+                    self._robot.data.projected_gravity_b + torch.randn_like(self._robot.data.projected_gravity_b) * 0.01,
                     self._commands,
-                    self._robot.data.joint_pos - self._robot.data.default_joint_pos,
-                    self._robot.data.joint_vel,
+                    self._robot.data.joint_pos - self._robot.data.default_joint_pos + torch.randn_like(self._robot.data.joint_pos - self._robot.data.default_joint_pos) * 0.01,
+                    self._robot.data.joint_vel + torch.randn_like(self._robot.data.joint_vel) * 0.01,
                     height_data,
                     self._actions,
                 )
@@ -177,7 +177,7 @@ class UnitreeGo2DirectEnv(DirectRLEnv):
         self._previous_actions[env_ids] = 0.0
         # Sample new commands
         self._commands[env_ids] = torch.zeros_like(self._commands[env_ids]).uniform_(-1.0, 1.0)
-        # self._commands[env_ids, 0] = torch.zeros_like(self._commands[env_ids, 0]) # to make sure the robot moves only forward
+        # self._commands[env_ids, 0] = torch.ones_like(self._commands[env_ids, 0]) # to make sure the robot moves only forward
         self._commands[env_ids, 1] = torch.zeros_like(self._commands[env_ids, 0]) # to make sure the robot moves only forward
         self._commands[env_ids, 2] = torch.zeros_like(self._commands[env_ids, 0]) # to make sure the robot moves only forward
         # print(self._commands[env_ids])

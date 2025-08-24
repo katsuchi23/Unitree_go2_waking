@@ -17,14 +17,15 @@ class Env():
         self.model = mujoco.MjModel.from_xml_path(self.model_path)
         self.model.opt.timestep = 0.005
         self.data = mujoco.MjData(self.model)
-        self.initial_position = np.array([ 
+        self.default_position = np.array([ 
                                     0.0, 0.0, 0.4, 1.0, 0.0, 0.0, 0.0,
                                     0.1,  0.8, -1.5,  # FL
                                     -0.1,  0.8, -1.5,  # FR
                                     0.1,  1.0, -1.5,  # RL
                                     -0.1,  1.0, -1.5   # RR
                                 ])
-        self.data.qpos[:] = self.initial_position
+        self.data.qpos[:] = self.default_position.copy()
+        self.initial_position = self.default_position.copy()
         self.initial_action = np.array([0.1, -0.1, 0.1, -0.1, 0.8, 0.8, 1.0, 1.0, -1.5, -1.5, -1.5, -1.5])
         self.prev_pos = self.data.qpos[0]
         self.contact_wrench = {
@@ -36,13 +37,14 @@ class Env():
         if not self.headless:
             self.viewer = mujoco.viewer.launch_passive(self.model, self.data)
 
+        self.command = np.zeros(3)
         self.previous_action = self.initial_action.copy()
 
     def reset(self):
         self.current_step = 0
         self.progressed_flag = True
         self.not_progressed_start_time = 0
-        self.data.qpos[:] = self.initial_position
+        self.data.qpos[:] = self.default_position.copy()
         self.prev_pos = self.data.qpos[0]
         self.data.qvel[:] = 0
         self.data.qacc[:] = 0
@@ -56,6 +58,8 @@ class Env():
             self.previous_action = action.copy()
             self.step(action)
         self.initial_position = self.data.qpos[7:].copy()
+        self.command[0] = 0.0
+        # print(self.initial_position)
     
     def get_rotation_matrix_from_quaternion(self, quat):
         """Convert quaternion to rotation matrix"""
@@ -170,7 +174,6 @@ class Env():
         velocity[10] = velocity_dummy[8]
         velocity[11] = velocity_dummy[11]
         
-        command = np.array([1.0, 0.0, 0.0])
 
         # Rest of your code...
         acceleration = self.data.qacc
@@ -179,7 +182,7 @@ class Env():
         for i in self.contact_wrench:
             contact_wrench = np.append(contact_wrench, self.contact_wrench[i])
 
-        state = np.concatenate((root_linear_vel, root_angular_vel, projected_gravity, command, position, velocity, self.previous_action))
+        state = np.concatenate((root_linear_vel, root_angular_vel, projected_gravity, self.command, position, velocity, self.previous_action))
         reward = self.reward()
         done = self.terminate()
         # print(state)

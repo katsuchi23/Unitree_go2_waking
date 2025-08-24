@@ -228,10 +228,10 @@ def main(env_cfg: ManagerBasedRLEnvCfg | DirectRLEnvCfg | DirectMARLEnvCfg, expe
             # print(action)
             env.step(action, scale=0.5)
             step += 1
-            # if step > 5000:
-            #     env.reset()
-            #     step = 0
-            #     continue
+            if step > 5000:
+                env.reset()
+                step = 0
+                continue
             # obs, _, _, _, _ = env.step(actions)
         if args_cli.video:
             timestep += 1
