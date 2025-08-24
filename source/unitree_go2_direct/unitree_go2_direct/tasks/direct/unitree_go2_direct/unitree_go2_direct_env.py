@@ -176,8 +176,10 @@ class UnitreeGo2DirectEnv(DirectRLEnv):
         self._actions[env_ids] = 0.0
         self._previous_actions[env_ids] = 0.0
         # Sample new commands
-        self._commands[env_ids] = torch.zeros_like(self._commands[env_ids]).uniform_(-1.0, 1.0)
+        self._commands[env_ids] = torch.zeros_like(self._commands[env_ids]).uniform_(0.0, 1.0)
         # self._commands[env_ids, 0] = torch.ones_like(self._commands[env_ids, 0]) # to make sure the robot moves only forward
+        # x = input("Enter command for forward movement: ")
+        # self._commands[env_ids, 0] = torch.ones_like(self._commands[env_ids, 0]) * float(x) # to make sure the robot moves only forward
         self._commands[env_ids, 1] = torch.zeros_like(self._commands[env_ids, 0]) # to make sure the robot moves only forward
         self._commands[env_ids, 2] = torch.zeros_like(self._commands[env_ids, 0]) # to make sure the robot moves only forward
         # print(self._commands[env_ids])

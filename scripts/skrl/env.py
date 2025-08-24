@@ -58,7 +58,7 @@ class Env():
             self.previous_action = action.copy()
             self.step(action)
         self.initial_position = self.data.qpos[7:].copy()
-        self.command[0] = 0.0
+        self.command[0] = float(input("Enter command for forward movement: "))
         # print(self.initial_position)
     
     def get_rotation_matrix_from_quaternion(self, quat):

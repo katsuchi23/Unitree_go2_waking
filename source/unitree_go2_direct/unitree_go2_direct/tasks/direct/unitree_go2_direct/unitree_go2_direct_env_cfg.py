@@ -33,8 +33,8 @@ class EventCfg:
         params={
             "asset_cfg": SceneEntityCfg("robot", body_names=".*"),
             "static_friction_range": (0.7, 1.3),
-            "dynamic_friction_range": (1.0, 1.0),
-            "restitution_range": (1.0, 1.0),
+            "dynamic_friction_range": (0.9, 1.0),
+            "restitution_range": (0.0, 0.0),
             "num_buckets": 256,
         },
     )
@@ -199,7 +199,6 @@ class UnitreeGo2RoughEnvCfg(DirectRLEnvCfg):
     feet_air_time_reward_scale = 0.5
     undesired_contact_reward_scale = -1.0
     flat_orientation_reward_scale = 0.0
-
 
 
 
