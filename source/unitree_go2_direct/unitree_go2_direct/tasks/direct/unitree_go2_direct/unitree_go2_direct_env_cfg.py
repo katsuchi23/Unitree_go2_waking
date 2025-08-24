@@ -100,9 +100,9 @@ class UnitreeGo2FlatEnvCfg(DirectRLEnvCfg):
 
     # reward scales
     lin_vel_reward_scale = 3.0
-    yaw_rate_reward_scale = 2.0
-    z_vel_reward_scale = -2.0
-    ang_vel_reward_scale = -0.05
+    yaw_rate_reward_scale = 3.0
+    z_vel_reward_scale = -4.0
+    ang_vel_reward_scale = -0.1
     joint_torque_reward_scale = -2.5e-5
     joint_accel_reward_scale = -2.5e-7
     action_rate_reward_scale = -0.01
@@ -187,7 +187,6 @@ class UnitreeGo2RoughEnvCfg(DirectRLEnvCfg):
     feet_air_time_reward_scale = 0.5
     undesired_contact_reward_scale = -1.0
     flat_orientation_reward_scale = 0.0
-
 
 
 

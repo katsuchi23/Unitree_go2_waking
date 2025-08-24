@@ -105,6 +105,7 @@ from isaaclab_tasks.utils import get_checkpoint_path
 from isaaclab_tasks.utils.hydra import hydra_task_config
 
 import unitree_go2_direct.tasks  # noqa: F401
+from env import Env
 
 # config shortcuts
 algorithm = args_cli.algorithm.lower()
@@ -195,15 +196,28 @@ def main(env_cfg: ManagerBasedRLEnvCfg | DirectRLEnvCfg | DirectMARLEnvCfg, expe
 
     # reset environment
     obs, _ = env.reset()
+    env = Env(headless=False)
+    env.reset()
+
     timestep = 0
+    step = 0
     # simulate environment
     while simulation_app.is_running():
         start_time = time.time()
-
+        state, _, _ = env.get_state()
         # run everything in inference mode
         with torch.inference_mode():
             # agent stepping
             outputs = runner.agent.act(obs, timestep=0, timesteps=0)
+
+
+            state = torch.tensor(state, dtype=torch.float32).unsqueeze(0).to(runner.agent.device)
+            action_tensor = runner.agent.act(state, timestep=0, timesteps=0)
+            action_tensor = action_tensor[-1].get("mean_actions", outputs[0])
+            action_tensor_random = 2 * torch.rand_like(action_tensor).to(runner.agent.device) - 1
+            action_tensor_zero = torch.zeros_like(action_tensor).to(runner.agent.device)
+            action = action_tensor.cpu().numpy().flatten()
+                # print(action)
             # - multi-agent (deterministic) actions
             if hasattr(env, "possible_agents"):
                 actions = {a: outputs[-1][a].get("mean_actions", outputs[0][a]) for a in env.possible_agents}
@@ -211,8 +225,14 @@ def main(env_cfg: ManagerBasedRLEnvCfg | DirectRLEnvCfg | DirectMARLEnvCfg, expe
             else:
                 actions = outputs[-1].get("mean_actions", outputs[0])
             # env stepping
-            print(obs[:,9:12])
-            obs, _, _, _, _ = env.step(actions)
+            # print(action)
+            env.step(action, scale=0.5)
+            step += 1
+            # if step > 5000:
+            #     env.reset()
+            #     step = 0
+            #     continue
+            # obs, _, _, _, _ = env.step(actions)
         if args_cli.video:
             timestep += 1
             # exit the play loop after recording one video

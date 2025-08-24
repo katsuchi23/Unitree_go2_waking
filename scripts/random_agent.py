@@ -58,6 +58,7 @@ def main():
         with torch.inference_mode():
             # sample actions from -1 to 1
             actions = 2 * torch.rand(env.action_space.shape, device=env.unwrapped.device) - 1
+            print(actions)
             # apply actions
             env.step(actions)
 
